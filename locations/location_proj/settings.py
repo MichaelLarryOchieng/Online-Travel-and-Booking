@@ -31,4 +31,5 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "rest_framework",#This is the rest framework we installed for communication between the frontend and backend in JSON format
 
