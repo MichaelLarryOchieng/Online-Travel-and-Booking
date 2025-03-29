@@ -32,4 +32,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "rest_framework",#This is the rest framework we installed for communication between the frontend and backend in JSON format
+    "location_app" #This is the locations microservice app we created called core
+    #Add the core app to the list of installed apps
 
