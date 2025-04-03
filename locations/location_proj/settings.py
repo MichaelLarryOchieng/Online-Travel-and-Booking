@@ -46,3 +46,5 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+ROOT_URLCONF = 'location_proj.urls'
+
