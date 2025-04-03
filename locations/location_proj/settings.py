@@ -48,3 +48,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'location_proj.urls'
 
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+
