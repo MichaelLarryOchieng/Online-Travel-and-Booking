@@ -66,6 +66,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'location_proj.wsgi.application'
 
+DATABASES = {
+    'default': {
+
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
