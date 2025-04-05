@@ -73,6 +73,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', #database engine in our case mysql instead of sqlite3
         'NAME': 'locations_ms', #database name
+        'USER': 'root',
+        'PASSWORD': 'mysql', #mysql workbench password
 
 
 
