@@ -66,10 +66,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'location_proj.wsgi.application'
 
+# Database
+# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+
 DATABASES = {
     'default': {
 
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+
+'ENGINE': 'django.db.backends.mysql', #database engine in our case mysql instead of sqlite3
 
 
