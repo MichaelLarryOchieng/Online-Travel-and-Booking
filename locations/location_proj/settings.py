@@ -72,6 +72,7 @@ WSGI_APPLICATION = 'location_proj.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', #database engine in our case mysql instead of sqlite3
+        'NAME': 'locations_ms', #database name
 
 
 
