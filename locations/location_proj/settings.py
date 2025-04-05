@@ -64,3 +64,5 @@ TEMPLATES = [
     },
 ]
 
+WSGI_APPLICATION = 'location_proj.wsgi.application'
+
