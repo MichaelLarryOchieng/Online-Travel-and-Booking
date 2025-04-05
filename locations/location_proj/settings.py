@@ -77,6 +77,8 @@ DATABASES = {
         'PASSWORD': 'mysql', #mysql workbench password
         'HOST': '127.0.0.1',
         'PORT':'3306', #connection port number
+        }
+    }
 
 
 
