@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Locations Data</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+    <h1>Locations Data</h1>
+    <table id="locationsTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>City</th>
+                <th>Country</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Airport Code</th>
+            </tr>
+        </thead>
+        <tbody>
+            </tbody>
+    </table>
+
+    <script>
+        //The JavaScript fetch() function is used to make an HTTP GET request 
+        // to the API endpoint /locations/api/locations/
+        fetch('/locations/api/locations/') // Fetch the API data
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.querySelector('#locationsTable tbody');
+                data.forEach(location => {
+                    const row = tableBody.insertRow();
+                    row.insertCell().textContent = location.location_id;
+                    row.insertCell().textContent = location.city;
+                    row.insertCell().textContent = location.country;
+                    row.insertCell().textContent = location.latitude;
+                    row.insertCell().textContent = location.longitude;
+                    row.insertCell().textContent = location.airport_code;
+                });
+            });
+    </script>
+</body>
+</html>
