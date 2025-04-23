@@ -1,6 +1,6 @@
 from django.db import models
 
-class City
+class City(models.Model)
 
 class Locations(models.Model):
     location_id = models.AutoField(primary_key=True)
