@@ -1,5 +1,7 @@
 from django.db import models
 
+class City
+
 class Locations(models.Model):
     location_id = models.AutoField(primary_key=True)
     location = models.CharField(max_length=255)
