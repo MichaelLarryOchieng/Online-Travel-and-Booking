@@ -2,6 +2,7 @@ from django.db import models
 
 class City(models.Model):
     name_id = models.AutoField(primary_key=True)
+    name = 
 
 class Locations(models.Model):
     location_id = models.AutoField(primary_key=True)
