@@ -1,0 +1,123 @@
+import requests
+from django.http import JsonResponse
+
+WEATHER_CODE_MAP = {
+    0: "Clear sky",
+    1: "Mainly clear",
+    2: "Partly cloudy",
+    3: "Overcast",
+    45: "Fog",
+    48: "Depositing rime fog",
+    51: "Light drizzle",
+    53: "Moderate drizzle",
+    55: "Dense drizzle",
+    56: "Light freezing drizzle",
+    57: "Dense freezing drizzle",
+    61: "Slight rain",
+    63: "Moderate rain",
+    65: "Heavy rain",
+    66: "Light freezing rain",
+    67: "Heavy freezing rain",
+    71: "Slight snow fall",
+    73: "Moderate snow fall",
+    75: "Heavy snow fall",
+    77: "Snow grains",
+    80: "Slight rain showers",
+    81: "Moderate rain showers",
+    82: "Violent rain showers",
+    85: "Slight snow showers",
+    86: "Heavy snow showers",
+    95: "Slight or moderate thunderstorm",
+    96: "Thunderstorm with slight hail",
+    99: "Thunderstorm with heavy hail",
+}
+
+def get_terrain_condition_data(request):
+    latitude_str = request.GET.get('latitude')
+    longitude_str = request.GET.get('longitude')
+
+    if not latitude_str or not longitude_str:
+        return JsonResponse({"error": "Latitude and longitude are required."}, status=400)
+
+    try:
+        latitude = float(latitude_str)
+        longitude = float(longitude_str)
+    except ValueError:
+        return JsonResponse({"error": "Invalid latitude or longitude."}, status=400)
+
+    # --- Fetch Weather Data ---
+    base_url_weather = "https://api.open-meteo.com/v1/forecast"
+    params_weather = {
+        "latitude": latitude,
+        "longitude": longitude,
+        "current_weather": True,
+        "hourly": "temperature_2m,precipitation,weathercode",
+        "timezone": "UTC"
+    }
+    weather_data = {}
+    current_condition_description = "Error fetching weather"
+    current_temperature = None
+    current_windspeed = None
+    try:
+        response_weather = requests.get(base_url_weather, params=params_weather)
+        response_weather.raise_for_status()
+        weather_data = response_weather.json()
+        current_weather = weather_data.get("current_weather", {})
+        current_condition_description = WEATHER_CODE_MAP.get(current_weather.get("weathercode"), "Unknown")
+        current_temperature = current_weather.get("temperature")
+        current_windspeed = current_weather.get("windspeed")
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching weather data: {e}")
+
+    # --- Fetch Elevation Data ---
+    base_url_elevation = "https://api.open-meteo.com/v1/elevation"
+    params_elevation = {
+        "latitude": latitude,
+        "longitude": longitude
+    }
+    elevation = None
+    try:
+        response_elevation = requests.get(base_url_elevation, params=params_elevation)
+        response_elevation.raise_for_status()
+        elevation_data = response_elevation.json()
+        if "elevation" in elevation_data and len(elevation_data["elevation"]) > 0:
+            elevation = elevation_data["elevation"][0]
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching elevation data: {e}")
+
+    # --- Categorize Terrain (Basic) ---
+    terrain_type = "Unknown"
+    if elevation is not None:
+        if elevation < 500:
+            terrain_type = "Generally flat"
+        elif 500 <= elevation < 1500:
+            terrain_type = "Hilly"
+        elif 1500 <= elevation < 2500:
+            terrain_type = "Mountainous"
+        else:
+            terrain_type = "High Mountainous"
+
+    # --- Infer Combined Conditions ---
+    combined_conditions = []
+    if current_condition_description and "rain" in current_condition_description.lower() and terrain_type.lower() == "generally flat":
+        combined_conditions.append("Likely muddy or with potential for localized flooding")
+    elif current_condition_description and "snow" in current_condition_description.lower() and elevation is not None and elevation > 1000:
+        combined_conditions.append("Likely snowy conditions, may require appropriate vehicle")
+    elif terrain_type.lower() in ["hilly", "mountainous", "high mountainous"]:
+        combined_conditions.append("Terrain may be challenging, consider vehicle suitability")
+
+    combined_summary = ", ".join(combined_conditions) if combined_conditions else "Terrain conditions appear normal based on current weather and elevation."
+
+    response_data = {
+        "current_condition": current_condition_description,
+        "temperature": current_temperature,
+        "windspeed": current_windspeed,
+        "elevation": elevation,
+        "terrain_type": terrain_type,
+        "combined_terrain_weather": combined_summary,
+        "latitude": weather_data.get("latitude"),
+        "longitude": weather_data.get("longitude"),
+        "timezone": weather_data.get("timezone"),
+    }
+
+    return JsonResponse(response_data)

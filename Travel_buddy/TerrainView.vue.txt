@@ -1,0 +1,148 @@
+<template>
+  <div>
+    <h2>Terrain Condition</h2>
+    <div v-if="loading">{{ loadingMessage }}</div>
+    <div v-if="error">{{ error }}</div>
+    <div v-if="terrainCondition">
+      <h3>Current Condition: {{ terrainCondition.current_condition }}</h3>
+      <p>Temperature: {{ terrainCondition.temperature }} °C</p>
+      <p>Wind Speed: {{ terrainCondition.windspeed }} km/h</p>
+      <p>Elevation: {{ terrainCondition.elevation }} m</p>
+      <p>Terrain Type: {{ terrainCondition.terrain_type }}</p>
+      <p><strong>Terrain & Weather Insights:</strong> {{ terrainCondition.combined_terrain_weather }}</p>
+      <p>Latitude: {{ terrainCondition.latitude }}</p>
+      <p>Longitude: {{ terrainCondition.longitude }}</p>
+      <p>Timezone: {{ terrainCondition.timezone }}</p>
+    </div>
+    <div v-else-if="!loading && !error && !searchResults.length">
+      <p>Enter a location to search for terrain condition data.</p>
+    </div>
+    <div v-if="searchResults.length">
+      <h3>Search Results:</h3>
+      <ul>
+        <li v-for="result in searchResults" :key="result.id" @click="selectLocation(result)">
+          {{ result.name }}, {{ result.admin1 }}, {{ result.country }} (Lat: {{ result.latitude }}, Lon: {{ result.longitude }})
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <label for="location">Search Location:</label>
+      <input type="text" id="location" v-model="searchQuery">
+      <button @click="searchLocation">Search</button>
+    </div>
+    <div>
+      <label for="latitude">Latitude:</label>
+      <input type="text" id="latitude" v-model="latitude" :readonly="selectedLocation">
+    </div>
+    <div>
+      <label for="longitude">Longitude:</label>
+      <input type="text" id="longitude" v-model="longitude" :readonly="selectedLocation">
+    </div>
+    <button @click="fetchTerrainCondition" :disabled="!latitude || !longitude">Fetch Terrain Condition</button>
+  </div>
+</template>
+
+
+
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      searchQuery: '',
+      searchResults: [],
+      latitude: null,
+      longitude: null,
+      terrainCondition: null, // Renamed from weatherData
+      loading: false,
+      loadingMessage: '',
+      error: null,
+      selectedLocation: false,
+    };
+  },
+  methods: {
+    async searchLocation() {
+      if (!this.searchQuery.trim()) {
+        this.searchResults = [];
+        return;
+      }
+      this.loading = true;
+      this.loadingMessage = 'Searching locations...';
+      this.error = null;
+      this.searchResults = [];
+      this.selectedLocation = false;
+      this.latitude = null;
+      this.longitude = null;
+      try {
+        const geocodingApiUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${this.searchQuery}&count=5`; // Limit to 5 results
+        const response = await axios.get(geocodingApiUrl);
+        if (response.data.results) {
+          this.searchResults = response.data.results;
+        } else {
+          this.searchResults = [];
+          this.error = 'No locations found matching your query.';
+        }
+      } catch (error) {
+        console.error('Error searching locations:', error);
+        this.error = 'Error searching for locations.';
+      } finally {
+        this.loading = false;
+        this.loadingMessage = '';
+      }
+    },
+    selectLocation(location) {
+      this.latitude = location.latitude;
+      this.longitude = location.longitude;
+      this.searchResults = [];
+      this.selectedLocation = true;
+    },
+    async fetchTerrainCondition() {
+      if (!this.latitude || !this.longitude) {
+        this.error = 'Please select a location or enter latitude and longitude.';
+        return;
+      }
+      this.loading = true;
+      this.loadingMessage = 'Fetching terrain condition...';
+      this.error = null;
+      this.terrainCondition = null; // Clear previous data
+      try {
+        const response = await axios.get(`/api/travel_buddy/terrain-condition/?latitude=${this.latitude}&longitude=${this.longitude}`);
+        this.terrainCondition = response.data; // Store the processed data
+        console.log("Terrain Condition:", this.terrainCondition);
+      } catch (error) {
+        console.error("Error fetching terrain condition:", error);
+        this.error = 'Failed to fetch terrain condition data.';
+        if (error.response && error.response.data) {
+          console.error("Backend Error:", error.response.data);
+          this.error += ` Backend error: ${JSON.stringify(error.response.data)}`;
+        }
+      } finally {
+        this.loading = false;
+        this.loadingMessage = '';
+      }
+    },
+  },
+};
+</script>
+
+<style scoped>
+/* Add component-specific styles here */
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+li {
+  cursor: pointer;
+  margin-bottom: 5px;
+  padding: 5px;
+  border: 1px solid #eee;
+}
+li:hover {
+  background-color: #f9f9f9;
+}
+input[readonly] {
+  background-color: #eee;
+}
+</style>

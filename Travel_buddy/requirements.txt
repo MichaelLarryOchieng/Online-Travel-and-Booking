@@ -1,0 +1,25 @@
+
+# Django 
+pillow # For handling image processing
+#VUE
+# Vue.js 
+axios # vue library for making HTTP requests to the backend
+bulma # CSS framework for styling the frontend
+font-awesome #open source icon library
+vue-leaflet # For integrating Leaflet maps in Vue.js
+django version 5.1.7 # The web framework for Python
+django_rest_framework# For building REST APIs
+django-cors-headers # Ensures the frontend can access the backend API
+djangorestframework # For building REST APIs
+django-cors-headers # Ensures the frontend can access the backend API
+djoser # For user authentication and registration
+leaflet # open source api For interactive maps
+geocoder # For geocoding addresses to coordinates
+# ignore this statement(python manage.py geocode_cities # For geocoding city names to coordinates)
+open-meteo-weatherforecast 
+open-meteo-elevation# For elevation data
+numpy 
+npm install date-fns date-fns-tz # For date and time manipulation
+geopy # For geospatial data handling
+jwt-decode# For decoding JWT tokens
+django-filter  # For filtering data in Django

@@ -1,0 +1,6 @@
+LightWeight documentation Group 3
+
+Feature/ What we are building: 
+Online Travel Agency with intergrated Terrain condition Tracker
+
+Problem Statement:
